@@ -34,9 +34,9 @@ public class UserStatistics {
     }
 
     public String processAramMMR(String data) throws JSONException {
+        //TODO: handle exception "No recent MMR data for summoner."
         JSONObject aram = (new JSONObject(data)).getJSONObject("ARAM");
-        String aramMMR = aram.getString("avg");
 
-        return aramMMR;
+        return aram.getString("avg");
     }
 }
