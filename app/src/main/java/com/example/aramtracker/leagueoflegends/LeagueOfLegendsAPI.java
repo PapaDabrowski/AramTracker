@@ -2,10 +2,10 @@ package com.example.aramtracker.leagueoflegends;
 
 import com.example.aramtracker.leagueoflegends.data.AramMatchSummonerInfo;
 
-import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
-
 import java.util.List;
 import java.util.Optional;
+
+import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
 public interface LeagueOfLegendsAPI {
 

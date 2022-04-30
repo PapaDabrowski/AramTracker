@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import no.stelar7.api.r4j.basic.APICredentials;
+
 public class Props {
 
     private final Properties properties = new Properties();
@@ -38,5 +40,9 @@ public class Props {
 
     public String getLolApiKey() {
         return properties.getProperty(LOL_API_KEY);
+    }
+
+    public APICredentials getApiCredentials() {
+        return new APICredentials(getLolApiKey(), null, null, null, null);
     }
 }
