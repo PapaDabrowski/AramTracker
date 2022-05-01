@@ -22,4 +22,5 @@ public class AramMatchSummonerInfo {
     public long getGameDuration() {
         return gameDuration;
     }
+
 }

@@ -14,7 +14,9 @@ import com.example.aramtracker.fragments.FavoriteFragment;
 import com.example.aramtracker.fragments.SearchFragment;
 import com.example.aramtracker.leagueoflegends.LeagueOfLegendsAPI;
 import com.example.aramtracker.leagueoflegends.LeagueOfLegendsApiImpl;
+import com.example.aramtracker.leagueoflegends.MatchMakingRatingApiImpl;
 import com.example.aramtracker.leagueoflegends.data.AramMatchSummonerInfo;
+import com.example.aramtracker.leagueoflegends.data.AramSummonerInfo;
 import com.example.aramtracker.properties.Props;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -51,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.nav_search :
                         selectorFragment = new SearchFragment();
-//                        startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
+                        String name = "Horniss";
+                        AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name).orElseThrow(() -> new IllegalStateException("Error for user" + name));
+                        Toast.makeText(MainActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getClosestRank(), Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_favorites:
                         selectorFragment = new FavoriteFragment();

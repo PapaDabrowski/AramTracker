@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.example.aramtracker.leagueoflegends.LeagueOfLegendsAPI;
 import com.example.aramtracker.leagueoflegends.LeagueOfLegendsApiImpl;
+import com.example.aramtracker.leagueoflegends.MatchMakingRatingApiImpl;
+import com.example.aramtracker.leagueoflegends.data.AramSummonerInfo;
 import com.example.aramtracker.properties.Props;
 
 import org.json.JSONException;
@@ -54,10 +56,6 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    public void onBtnClick (View view) throws JSONException, IOException {
-        EditText editTextName = findViewById(R.id.editTextTextPersonName);
-        UserStatistics user = new UserStatistics(editTextName.getText().toString());
-        TextView t = findViewById(R.id.test1);
-        t.setText(user.getNickname() + ": " + user.getAramMMR());
+    public void onBtnClick (View view){
     }
 }
