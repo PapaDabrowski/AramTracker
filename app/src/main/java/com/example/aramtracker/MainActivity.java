@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_favorites:
                         selectorFragment = new FavoriteFragment();
                         LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-                        List<AramMatchSummonerInfo> stats = leagueOfLegendsAPI.getAramMatchInfosByNickAndChampion("Horniss", "Qiyana");
+                        List<AramMatchSummonerInfo> stats = leagueOfLegendsAPI.getAramMatchInfosByNickAndChampion("Bodziuguard", "Malphite");
                         OptionalDouble avgDamage = stats.stream()
                                 .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
                                 .average();

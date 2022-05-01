@@ -5,9 +5,6 @@ import com.example.aramtracker.leagueoflegends.retryer.SynchronizedRetryer;
 import com.example.aramtracker.properties.Props;
 import com.jayway.jsonpath.JsonPath;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,16 +21,18 @@ import no.stelar7.api.r4j.impl.R4J;
 import static no.stelar7.api.r4j.basic.constants.api.regions.RegionShard.EUROPE;
 import static no.stelar7.api.r4j.basic.constants.types.lol.GameQueueType.ARAM;
 import static no.stelar7.api.r4j.basic.constants.types.lol.MatchlistMatchType.NORMAL;
+
+import android.util.Log;
+
 import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch;
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant;
+import no.stelar7.api.r4j.pojo.lol.spectator.SpectatorGameInfo;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
-
-    private final static Logger logger = LoggerFactory.getLogger(LeagueOfLegendsApiImpl.class);
 
     private final static String CHAMPION_INFO_LINK = "https://ddragon.leagueoflegends.com/cdn/12.8.1/data/en_US/champion.json";
 
@@ -79,16 +78,15 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
             int count = 100;
             List<String> matchIds = riotNewAPI.getLoLAPI().getMatchAPI().getMatchList(EUROPE, puuId, ARAM, NORMAL, beginIndex, count, null, null);
             while (!matchIds.isEmpty()) {
-                logger.info("Processing matchList {}-{} of user {}", beginIndex, beginIndex + count, nick);
-                System.out.println("Processing matchList: " + nick + beginIndex);
+                Log.i("LolMatchesInfo", String.format("Processing matchlist %d-%d for user %s", beginIndex, beginIndex + count, nick));
                 aramStats.addAll(processMatches(puuId, matchIds));
                 beginIndex += count;
                 matchIds = riotNewAPI.getLoLAPI().getMatchAPI().getMatchList(EUROPE, puuId, ARAM, NORMAL, beginIndex, count, null, null);
             }
         } catch (Exception ex) {
-            logger.warn("Exception during processing match list of user: " + nick, ex);
+            Log.w("LolMatchesInfo","Exception during processing match list of user: " + nick, ex);
         }
-        logger.info("Processed {} games of user {}", aramStats.size(), nick);
+        Log.i("LolMatchesInfo", String.format("Processed %d games of user %s", aramStats.size(), nick));
 //        cache.put(nick, aramStats);
         return aramStats;
     }
@@ -98,8 +96,7 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
         for (String matchId : matchIds) {
             try {
                 Thread.sleep(50);
-                logger.info("Processing match {}", matchId);
-                System.out.println("Processing match " + matchId);
+                Log.i("LolProcessMatches", "Processing match " + matchId);
                 LOLMatch match = getMatch(EUROPE, matchId)
                         .orElseThrow(() -> new IllegalStateException("Match with id: " + matchId + " not found"));
                 MatchParticipant participant = match.getParticipants().stream()
@@ -111,10 +108,14 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
                 long dmgDealtToChamps = participant.getTotalDamageDealtToChampions();
                 aramStats.add(new AramMatchSummonerInfo(championId, dmgDealtToChamps, gameDuration));
             } catch (Exception ex) {
-                logger.warn("Match {} processing failed", matchId, ex);
+                Log.w("LolProcessMatches", String.format("Match %s processing failed", matchId), ex);
             }
         }
         return aramStats;
+    }
+
+    private Optional<SpectatorGameInfo> getCurrentGame(String summonerId){
+        return retryer.callWithRetries(() -> riotNewAPI.getLoLAPI().getSpectatorAPI().getCurrentGame(LeagueShard.EUN1, summonerId));
     }
 
     private Optional<LOLMatch> getMatch(RegionShard regionShard, String matchId) {
