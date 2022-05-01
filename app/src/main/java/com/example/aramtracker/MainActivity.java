@@ -24,6 +24,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
@@ -49,23 +50,35 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
 
                 switch (item.getItemId()) {
                     case R.id.nav_search :
                         selectorFragment = new SearchFragment();
-                        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
-                        String name = "Horniss";
-                        AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name).orElseThrow(() -> new IllegalStateException("Error for user" + name));
-                        Toast.makeText(MainActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getClosestRank(), Toast.LENGTH_SHORT).show();
+                        String nick = "Bodziuguard";
+                        try {
+                            AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(nick).orElseThrow(() -> new IllegalStateException("Error for user " + nick));
+                            Toast.makeText(MainActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getClosestRank(), Toast.LENGTH_SHORT).show();
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case R.id.nav_favorites:
                         selectorFragment = new FavoriteFragment();
                         LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-                        List<AramMatchSummonerInfo> stats = leagueOfLegendsAPI.getAramMatchInfosByNickAndChampion("Bodziuguard", "Malphite");
-                        OptionalDouble avgDamage = stats.stream()
-                                .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
-                                .average();
-                        Toast.makeText(MainActivity.this, "avgDamage: " + avgDamage, Toast.LENGTH_SHORT).show();
+                        Map<Integer, List<String>> currentGameParticipants = leagueOfLegendsAPI.getCurrentGameParticipantsByNick("Duke Alimony");
+                        for (Integer team: currentGameParticipants.keySet()) {
+//                            String key = team.toString();
+//                            String value = currentGameParticipants.get(team).toString();
+                            for (String name: currentGameParticipants.get(team)) {
+                                try {
+                                    AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name).orElseThrow(() -> new IllegalStateException("Error for user " + name));
+                                    Toast.makeText(MainActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getClosestRank(), Toast.LENGTH_SHORT).show();
+                                } catch (IllegalStateException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
                         break;
                     default:
                         break;

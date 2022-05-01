@@ -28,16 +28,26 @@ public class MatchMakingRatingApiImpl implements MatchMakingRatingAPI{
         try {
             Response response = client.newCall(request).execute();
             String result = response.body().string();
-            String closestRank = JsonPath.read(result, "$.ARAM.closestRank");
-            int aramMMR = JsonPath.read(result, "$.ARAM.avg");
-            int standardDeviation = JsonPath.read(result, "$.ARAM.err");
-            double percentile = JsonPath.read(result, "$.ARAM.percentile");
-            AramSummonerInfo summonerInfo = new AramSummonerInfo(nick, closestRank, aramMMR, standardDeviation, percentile);
-            return Optional.ofNullable(summonerInfo);
+            return Optional.ofNullable(processSummonerInfo(nick, result));
         } catch (Exception ex) {
             Log.w("MMRInfo", String.format("Whatismymmr for summoner %s failed", nick), ex);
-            ex.printStackTrace();
         }
         return Optional.empty();
+    }
+
+    private AramSummonerInfo processSummonerInfo(String nick, String data) {
+
+        try {
+            String closestRank = JsonPath.read(data, "$.ARAM.closestRank");
+            int aramMMR = JsonPath.read(data, "$.ARAM.avg");
+            int standardDeviation = JsonPath.read(data, "$.ARAM.err");
+            double percentile = JsonPath.read(data, "$.ARAM.percentile");
+            return new AramSummonerInfo(nick, closestRank, aramMMR, standardDeviation, percentile);
+
+        } catch (Exception ex) {
+            Log.w("MMRInfo", "Missing stats for" + nick, ex);
+        }
+        return null;
+        
     }
 }

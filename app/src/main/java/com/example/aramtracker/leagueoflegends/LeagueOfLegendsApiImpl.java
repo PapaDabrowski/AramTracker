@@ -1,5 +1,7 @@
 package com.example.aramtracker.leagueoflegends;
 
+import static java.util.stream.Collectors.toList;
+
 import com.example.aramtracker.leagueoflegends.data.AramMatchSummonerInfo;
 import com.example.aramtracker.leagueoflegends.retryer.SynchronizedRetryer;
 import com.example.aramtracker.properties.Props;
@@ -27,6 +29,7 @@ import android.util.Log;
 import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch;
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant;
 import no.stelar7.api.r4j.pojo.lol.spectator.SpectatorGameInfo;
+import no.stelar7.api.r4j.pojo.lol.spectator.SpectatorParticipant;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -53,7 +56,7 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
         return cache.values().stream()
                 .flatMap(Collection::stream)
                 .filter(stats -> stats.getChampionId() == championId)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -62,7 +65,31 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
         long championId = getChampionIdByName(champion);
         return aramStats.stream()
                 .filter(stats -> stats.getChampionId() == championId)
-                .collect(Collectors.toList());
+                .collect(toList());
+    }
+
+    @Override
+    public Map<Integer, List<String>> getCurrentGameParticipantsByNick(String nick) {
+        Map<Integer, List<String>> currentGameParticipants = new HashMap<>();
+
+        try {
+//            String id = getSummonerStats(nick)
+//                    .map(Summoner::getSummonerId)
+//                    .orElseThrow(() -> new IllegalStateException("Couldn't find id of user with nick:" + nick));
+            String id = "hdMh8JINwlW0YE8K6U1IeQQnVy_0cHFpjxk19y6oyHVL_ZY";
+
+            SpectatorGameInfo spectatorGameInfo = getCurrentGame(id).orElseThrow(() -> new IllegalStateException("Couldn't find live game for summoner: " + nick));
+            currentGameParticipants = spectatorGameInfo.getParticipants()
+                    .stream()
+                    .collect(Collectors.groupingBy(p -> p.getTeam().getValue(),
+                            Collectors.mapping(SpectatorParticipant::getSummonerName, toList())));
+
+        } catch (Exception ex) {
+            Log.w("LolCurretnGame","Exception during collecting current game participants of user: " + nick, ex);
+            ex.printStackTrace();
+        }
+
+        return currentGameParticipants;
     }
 
     public List<AramMatchSummonerInfo> getAramMatchesInfo(String nick) {
