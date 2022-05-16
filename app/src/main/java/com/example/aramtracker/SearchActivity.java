@@ -37,7 +37,7 @@ public class SearchActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_search);
 
-        initViews();
+//        initViews();
 
 
 //        LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
@@ -49,12 +49,12 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    public void initViews() {
-        btnFind = findViewById(R.id.buttonFind);
-        editTextName = findViewById(R.id.editTextTextPersonName);
-        textView = findViewById(R.id.test1);
-
-    }
+//    public void initViews() {
+//        btnFind = findViewById(R.id.buttonFind);
+//        editTextName = findViewById(R.id.editTextTextPersonName);
+//        textView = findViewById(R.id.test1);
+//
+//    }
 
     public void onBtnClick (View view){
     }

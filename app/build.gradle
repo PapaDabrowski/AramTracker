@@ -31,6 +31,7 @@ android {
 }
 
 dependencies {
+    implementation 'org.mongodb:mongo-java-driver:2.12.3'
 
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'com.github.stelar7:R4J:2.1.6'
