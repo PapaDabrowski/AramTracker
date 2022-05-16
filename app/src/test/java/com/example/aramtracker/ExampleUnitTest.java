@@ -29,7 +29,7 @@ public class ExampleUnitTest {
             DB database = mongoClient.getDB("TestDatabase");
             DBCollection collectionTest = database.getCollection("test");
             List<Integer> books = Arrays.asList(27464, 747854);
-            DBObject person = new BasicDBObject("_id", "yo")
+            DBObject person = new BasicDBObject("_id", "oy")
                     .append("name", "Dildo Swaggins")
                     .append("address", new BasicDBObject("street", "123 Fake St")
                             .append("city", "Faketon")

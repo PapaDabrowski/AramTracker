@@ -73,10 +73,9 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
         Map<Integer, List<String>> currentGameParticipants = new HashMap<>();
 
         try {
-//            String id = getSummonerStats(nick)
-//                    .map(Summoner::getSummonerId)
-//                    .orElseThrow(() -> new IllegalStateException("Couldn't find id of user with nick:" + nick));
-            String id = "hdMh8JINwlW0YE8K6U1IeQQnVy_0cHFpjxk19y6oyHVL_ZY";
+            String id = getSummonerStats(nick)
+                    .map(Summoner::getSummonerId)
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find id of user with nick:" + nick));
 
             SpectatorGameInfo spectatorGameInfo = getCurrentGame(id).orElseThrow(() -> new IllegalStateException("Couldn't find live game for summoner: " + nick));
             currentGameParticipants = spectatorGameInfo.getParticipants()
