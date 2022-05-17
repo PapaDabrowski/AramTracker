@@ -29,6 +29,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import org.json.JSONException;
+
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -42,6 +43,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
 
+import io.paperdb.Paper;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
 public class SearchActivity extends AppCompatActivity {
@@ -62,26 +64,25 @@ public class SearchActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_search);
 
-        EditText playerName = (EditText)findViewById(R.id.editTextTextPersonName);
-        Spinner  playerServer = (Spinner)findViewById(R.id.playerServerSpinner);
+        EditText playerName = (EditText) findViewById(R.id.editTextTextPersonName);
+        Spinner playerServer = (Spinner) findViewById(R.id.playerServerSpinner);
 
         Button trackPlayer = (Button) findViewById(R.id.buttonFind);
-        trackPlayer.setOnClickListener(new View.OnClickListener()
-        {
+        trackPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(),
                         MainActivity.class);
-                if(!playerName.getText().toString().isEmpty()) {
+                if (!playerName.getText().toString().isEmpty()) {
                     i.putExtra("playerName", playerName.getText().toString());
                     i.putExtra("playerServer", playerServer.getSelectedItem().toString());
                     startActivity(i);
-                }
-                else
-                {
+                } else {
                     Toast.makeText(SearchActivity.this, "Insert Nickname!", Toast.LENGTH_SHORT).show();
                 }
             }
+
+
         });
 
         //DISPLAY EXAMPLE

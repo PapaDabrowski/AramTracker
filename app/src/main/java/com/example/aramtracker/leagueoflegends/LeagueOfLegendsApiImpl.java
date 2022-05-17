@@ -154,10 +154,11 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
                         .filter(p -> p.getPuuid().equals(puuId))
                         .findFirst()
                         .orElseThrow(() -> new IllegalStateException("Participant " + puuId + " not found in match " + matchId));
+                boolean win = participant.didWin();
                 long championId = participant.getChampionId();
                 long gameDuration = match.getGameDuration();
                 long dmgDealtToChamps = participant.getTotalDamageDealtToChampions();
-                aramStats.add(new AramMatchSummonerInfo(championId, dmgDealtToChamps, gameDuration));
+                aramStats.add(new AramMatchSummonerInfo(championId, dmgDealtToChamps, gameDuration, win));
             } catch (Exception ex) {
                 Log.w("LolProcessMatches", String.format("Match %s processing failed", matchId), ex);
             }
