@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.paperdb.Paper;
 import no.stelar7.api.r4j.basic.cache.impl.MemoryCacheProvider;
 import no.stelar7.api.r4j.basic.calling.DataCall;
 import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
@@ -43,10 +44,12 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
     private static Map<String, List<AramMatchSummonerInfo>> cache = new HashMap<>();
     private final R4J riotNewAPI ;
     private final SynchronizedRetryer retryer;
+    private final String championData;
 
     public LeagueOfLegendsApiImpl(Props props) {
         this.retryer = new SynchronizedRetryer();
         this.riotNewAPI  = new R4J(props.getApiCredentials());
+        this.championData = fetchChampionsIds();
         DataCall.setCacheProvider(new MemoryCacheProvider());
 
     }
@@ -118,9 +121,9 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
 
     public List<AramMatchSummonerInfo> getAramMatchesInfo(String nick) {
         List<AramMatchSummonerInfo> aramStats = new ArrayList<>();
-//        if (cache.containsKey(nick)) {
-//            return cache.get(nick);
-//        }
+        if (Paper.book().contains(nick)) {
+            return Paper.book().read(nick);
+        }
         try {
             String puuId = getSummonerStats(nick)
                     .map(Summoner::getPUUID)
@@ -138,7 +141,7 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
             Log.w("LolMatchesInfo","Exception during processing match list of user: " + nick, ex);
         }
         Log.i("LolMatchesInfo", String.format("Processed %d games of user %s", aramStats.size(), nick));
-//        cache.put(nick, aramStats);
+        Paper.book().write(nick, aramStats);
         return aramStats;
     }
 
@@ -180,15 +183,8 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
     }
 
     private long getChampionIdByName(String name) {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(CHAMPION_INFO_LINK)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            String result = response.body().string();
-            String key = JsonPath.read(result, "$.data." + name + ".key");
+        try {
+            String key = JsonPath.read(championData, "$.data." + name + ".key");
             return Long.parseLong(key);
         } catch (Exception ex) {
             Log.w("LolChampionId", "Can't get id for champion name: " + name, ex);
@@ -201,12 +197,27 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
 
         Set<String> championsNames = getChampionsNames();
         for (String championName: championsNames.toArray(new String[0])) {
-            Log.i("LolGetChampions", "Getting id for champion " + championName);
             championsAndChampionsIds.put(championName, getChampionIdByName(championName));
+            Log.i("LolGetChampions", "Getting id for champion " + championName);
         }
 
         return championsAndChampionsIds;
 
+    }
+
+    private String fetchChampionsIds(){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(CHAMPION_INFO_LINK)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String result = response.body().string();
+            return result;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        throw new IllegalStateException();
     }
 
     public Set<String> getChampionsNames() {
