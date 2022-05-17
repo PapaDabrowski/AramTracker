@@ -1,5 +1,7 @@
 package com.example.aramtracker;
 
+import static java.util.stream.Collectors.toList;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.Set;
 
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
@@ -121,6 +124,33 @@ public class SearchActivity extends AppCompatActivity {
 //                .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
 //                .average();
 //        Toast.makeText(SearchActivity.this, "User:  " + nick + " | Champion: " + champion + " AVG DMG: " + avgDamage , Toast.LENGTH_SHORT).show();
+
+        // IF IN LIVE GAME
+//        LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+//        String nnn = "FirmaReported";
+//        if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nnn)) {
+//            Toast.makeText(SearchActivity.this, "Player " + nnn + " in live game", Toast.LENGTH_SHORT).show();
+//        }
 //
+        // AVG DMG PER CHAMPION
+//        String nick = "koncaty3K";
+//        LeagueOfLegendsApiImpl leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+//        //To będzie wyciągane z bazy
+//        List<AramMatchSummonerInfo> aramMatchSummonerInfo = leagueOfLegendsAPI.getAramMatchesInfo(nick);
+//        Map<String, Long> championsWithIds = leagueOfLegendsAPI.getChampionAndChampionsIds();
+//        for (String champ: championsWithIds.keySet()) {
+//            List<AramMatchSummonerInfo> statsForChampion = leagueOfLegendsAPI.getAramMatchInfoByChampion(aramMatchSummonerInfo, championsWithIds.get(champ));
+//            long totalGames = statsForChampion.size();
+//            OptionalDouble avgDmg = statsForChampion.stream()
+//                    .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
+//                    .average();
+//            OptionalDouble avgDuration = statsForChampion.stream()
+//                    .mapToLong(AramMatchSummonerInfo::getGameDuration)
+//                    .average();
+//            if (avgDmg.isPresent() && totalGames > 0 && avgDuration.isPresent()) {
+//                double damagePerMinute = avgDmg.getAsDouble() / (avgDuration.getAsDouble() / 60.0);
+//                Toast.makeText(SearchActivity.this, " Champion: " + champ + " dmg/min: " + damagePerMinute, Toast.LENGTH_SHORT).show();
+//            }
+//        }
     }
 }

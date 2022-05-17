@@ -17,5 +17,9 @@ public interface LeagueOfLegendsAPI {
 
     Map<Integer, List<String>> getCurrentGameParticipantsByNick(String nick);
 
+    List<AramMatchSummonerInfo> getAramMatchInfoByChampion(List<AramMatchSummonerInfo> stats, Long championId);
+
+    Boolean checkIfPlayerInLiveGame(String nick);
+
     Optional<Summoner> getSummonerStats(String nick);
 }

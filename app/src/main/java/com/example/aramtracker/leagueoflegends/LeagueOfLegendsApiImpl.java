@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import no.stelar7.api.r4j.basic.cache.impl.MemoryCacheProvider;
@@ -84,11 +85,35 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
                             Collectors.mapping(SpectatorParticipant::getSummonerName, toList())));
 
         } catch (Exception ex) {
-            Log.w("LolCurretnGame","Exception during collecting current game participants of user: " + nick, ex);
+            Log.w("LolCurrentGame","Exception during collecting current game participants of user: " + nick, ex);
             ex.printStackTrace();
         }
 
         return currentGameParticipants;
+    }
+
+    @Override
+    public List<AramMatchSummonerInfo> getAramMatchInfoByChampion(List<AramMatchSummonerInfo> aramStats, Long championId) {
+        return aramStats.stream()
+                .filter(stats -> stats.getChampionId() == championId)
+                .collect(toList());
+    }
+
+    @Override
+    public Boolean checkIfPlayerInLiveGame(String nick) {
+        try {
+            String id = getSummonerStats(nick)
+                    .map(Summoner::getSummonerId)
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find id of user with nick:" + nick));
+
+            SpectatorGameInfo spectatorGameInfo = getCurrentGame(id).orElseThrow(() -> new IllegalStateException("Couldn't find live game for summoner: " + nick));
+            return true;
+        } catch (Exception ex) {
+            Log.w("LolCurrentGame","Exception during collecting current game participants of user: " + nick, ex);
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 
     public List<AramMatchSummonerInfo> getAramMatchesInfo(String nick) {
@@ -164,11 +189,38 @@ public class LeagueOfLegendsApiImpl implements LeagueOfLegendsAPI{
             String result = response.body().string();
             String key = JsonPath.read(result, "$.data." + name + ".key");
             return Long.parseLong(key);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Log.w("LolChampionId", "Can't get id for champion name: " + name, ex);
         }
         return -1;
     }
 
+    public Map<String, Long> getChampionAndChampionsIds(){
+        Map<String, Long> championsAndChampionsIds = new HashMap<>();
 
+        Set<String> championsNames = getChampionsNames();
+        for (String championName: championsNames.toArray(new String[0])) {
+            Log.i("LolGetChampions", "Getting id for champion " + championName);
+            championsAndChampionsIds.put(championName, getChampionIdByName(championName));
+        }
+
+        return championsAndChampionsIds;
+
+    }
+
+    public Set<String> getChampionsNames() {
+        Set<String> data = null;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(CHAMPION_INFO_LINK)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String result = response.body().string();
+            data = JsonPath.read(result, "$.data.keys()");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return data;
+    }
 }
