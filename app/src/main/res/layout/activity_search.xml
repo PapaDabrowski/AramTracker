@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".SearchActivity">
 
     <ImageView
         android:id="@+id/imageView9"
-        android:layout_width="1300dp"
-        android:layout_height="1200dp"
+        android:layout_width="1544dp"
+        android:layout_height="1441dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
@@ -18,6 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.525"
         app:srcCompat="@drawable/background_lol" />
 
     <TextView
@@ -57,6 +60,8 @@
         android:layout_marginEnd="57dp"
         android:ems="10"
         android:hint="Name"
+        android:fontFamily="@font/league"
+        android:textColorHint="#dac478"
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:textColor="#dac478"
@@ -68,12 +73,14 @@
         app:layout_constraintVertical_bias="0.443" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/playerServerSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="36dp"
         android:entries="@array/platform"
         android:minHeight="48dp"
+        android:text="#dac478"
+        android:fontFamily="@font/league"
         app:layout_constraintBottom_toBottomOf="@+id/editTextTextPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/editTextTextPersonName"

@@ -1,32 +1,24 @@
 package com.example.aramtracker;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.aramtracker.fragments.FavoriteFragment;
-import com.example.aramtracker.fragments.SearchFragment;
-import com.example.aramtracker.leagueoflegends.LeagueOfLegendsAPI;
-import com.example.aramtracker.leagueoflegends.LeagueOfLegendsApiImpl;
 import com.example.aramtracker.leagueoflegends.MatchMakingRatingApiImpl;
-import com.example.aramtracker.leagueoflegends.data.AramMatchSummonerInfo;
 import com.example.aramtracker.leagueoflegends.data.AramSummonerInfo;
-import com.example.aramtracker.properties.Props;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
-import org.json.JSONException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.Locale;
 
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
@@ -38,12 +30,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TextView nickNameTextView = (TextView)findViewById(R.id.nickName);
+        TextView temp = (TextView)findViewById(R.id.lol2);
+        ImageView rankView = (ImageView)findViewById(R.id.rank);
+
+
+        Intent i = getIntent();
+        String nickName = i.getStringExtra("playerName");
+        String server = i.getStringExtra("playerServer");
+        nickNameTextView.setText(nickName);
+
+        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
+        try {
+           AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(nickName, server.toLowerCase(Locale.ROOT)).orElseThrow(() -> new IllegalStateException("Error for user " + nickName));
+           String imageUri = "@drawable/" + parseRank(summonerInfo.getClosestRank());
+
+           int imageResource = getResources().getIdentifier(imageUri, null, getPackageName());
+           Drawable res = getResources().getDrawable(imageResource);
+           rankView.setImageDrawable(res);
+           temp.setText(summonerInfo.getClosestRank());
+
+           //summonerInfo.
+
+        } catch (IllegalStateException e) {
+           e.printStackTrace();
+           Toast.makeText(MainActivity.this, "No stats for user: " + nickName, Toast.LENGTH_SHORT).show();
+           super.onBackPressed();
+        }
 //
 //        bottomNavigationView = findViewById(R.id.bottom_navigation);
 //
@@ -97,6 +120,34 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
 
+    }
+
+    private String parseRank(String rank)
+    {
+        String arr[] = rank.split(" ", 2);
+
+        String baseRank = arr[0];
+        String stage = arr[1];
+
+        if("challenger".equalsIgnoreCase(baseRank))
+            return "challenger";
+        if("grandmaster".equalsIgnoreCase(baseRank))
+            return "grandmaster";
+        if("master".equalsIgnoreCase(baseRank))
+            return "master";
+        if("diamond".equalsIgnoreCase(baseRank))
+            return "diamond";
+        if("platinum".equalsIgnoreCase(baseRank))
+            return "platinum";
+        if("gold".equalsIgnoreCase(baseRank))
+            return "gold";
+        if("silver".equalsIgnoreCase(baseRank))
+            return "silver";
+        if("bronze".equalsIgnoreCase(baseRank))
+            return "bronze";
+        if("iron".equalsIgnoreCase(baseRank))
+            return "iron";
+        return "";
     }
 
 

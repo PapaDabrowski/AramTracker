@@ -2,11 +2,13 @@ package com.example.aramtracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import org.json.JSONException;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -47,12 +51,37 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_search);
 
-        //DISPLAY
+        EditText playerName = (EditText)findViewById(R.id.editTextTextPersonName);
+        Spinner  playerServer = (Spinner)findViewById(R.id.playerServerSpinner);
+
+        Button trackPlayer = (Button) findViewById(R.id.buttonFind);
+        trackPlayer.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(),
+                        MainActivity.class);
+                if(!playerName.getText().toString().isEmpty()) {
+                    i.putExtra("playerName", playerName.getText().toString());
+                    i.putExtra("playerServer", playerServer.getSelectedItem().toString());
+                    startActivity(i);
+                }
+                else
+                {
+                    Toast.makeText(SearchActivity.this, "Insert Nickname!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //DISPLAY EXAMPLE
 //        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
 //        String nick = "Horniss";
 //        try {

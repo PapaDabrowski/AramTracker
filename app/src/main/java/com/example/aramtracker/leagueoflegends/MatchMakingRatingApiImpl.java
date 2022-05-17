@@ -14,14 +14,14 @@ import okhttp3.Response;
 public class MatchMakingRatingApiImpl implements MatchMakingRatingAPI{
 
     private final String PARTIAL_LINK = ".whatismymmr.com/api/v1/summoner?name=";
-    private final String PLATFORM = "eune";
+    //private final String PLATFORM = "eune";
 
     @Override
-    public Optional<AramSummonerInfo> getSummonerInfoByNick(String nick) {
+    public Optional<AramSummonerInfo> getSummonerInfoByNick(String nick, String server) {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://" + PLATFORM + PARTIAL_LINK + nick)
+                .url("https://" + server + PARTIAL_LINK + nick)
                 .build();
 
         Log.i("MMRInfo", "Requesting whatismymmr for summoner " + nick);
