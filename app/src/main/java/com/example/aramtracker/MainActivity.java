@@ -1,5 +1,6 @@
 package com.example.aramtracker;
 
+import static android.R.color.holo_green_dark;
 import static android.R.color.holo_red_light;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ import com.example.aramtracker.leagueoflegends.data.AramSummonerInfo;
 import com.example.aramtracker.properties.Props;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         String nickName = i.getStringExtra("playerName");
         String server = i.getStringExtra("playerServer");
 
-        TextView addToFav = (TextView)findViewById(R.id.addToFav);
+        TextView addToFav = (TextView) findViewById(R.id.addToFav);
         addToFav.setText("Add +");
         addToFav.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,82 +80,75 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TextView nickNameTextView = (TextView)findViewById(R.id.nickName);
+        TextView nickNameTextView = (TextView) findViewById(R.id.nickName);
         nickNameTextView.setText(nickName);
 
-        TextView rankNameTextView = (TextView)findViewById(R.id.rankName);
+        TextView rankNameTextView = (TextView) findViewById(R.id.rankName);
 
-        ImageView rankView = (ImageView)findViewById(R.id.rank);
+        ImageView rankView = (ImageView) findViewById(R.id.rank);
 
-        TextView liveStatus = (TextView)findViewById(R.id.liveStatus);
+        TextView liveStatus = (TextView) findViewById(R.id.liveStatus);
 
-        TextView mmrView = (TextView)findViewById(R.id.mmrTextView);
+        TextView mmrView = (TextView) findViewById(R.id.mmrTextView);
 
-        ListView listView = (ListView)findViewById(R.id.listView);
+        ListView listView = (ListView) findViewById(R.id.listView);
 
         MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
         try {
-           AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(nickName, server.toLowerCase(Locale.ROOT)).orElseThrow(() -> new IllegalStateException("Error for user " + nickName));
-           String imageUri = "@drawable/" + parseRank(summonerInfo.getClosestRank());
+            AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(nickName, server.toLowerCase(Locale.ROOT)).orElseThrow(() -> new IllegalStateException("Error for user " + nickName));
+            String imageUri = "@drawable/" + parseRank(summonerInfo.getClosestRank());
 
-           int imageResource = getResources().getIdentifier(imageUri, null, getPackageName());
-           Drawable res = getResources().getDrawable(imageResource);
-           rankView.setImageDrawable(res);
-           rankNameTextView.setText(summonerInfo.getClosestRank());
+            int imageResource = getResources().getIdentifier(imageUri, null, getPackageName());
+            Drawable res = getResources().getDrawable(imageResource);
+            rankView.setImageDrawable(res);
+            rankNameTextView.setText(summonerInfo.getClosestRank());
 
-           mmrView.setText(Integer.toString(summonerInfo.getAramMMR()));
-           LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-           String status = "OFFLINE";
-           if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nickName)) {
-               status = "LIVE";
-               liveStatus.setTextColor(holo_red_light);
-               liveStatus.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View v) {
-                       Intent i = new Intent(getApplicationContext(),
-                               LiveGameActivity.class);
-                       i.putExtra("playerName", nickName);
-                       startActivity(i);
-                   }
-               });
-           }
-           liveStatus.setText(status);
+            mmrView.setText(Integer.toString(summonerInfo.getAramMMR()));
+            LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+            String status = "OFFLINE";
+            if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nickName)) {
+                status = "LIVE";
+                liveStatus.setTextColor(holo_green_dark);
+                liveStatus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getApplicationContext(),
+                                LiveGameActivity.class);
+                        i.putExtra("playerName", nickName);
+                        startActivity(i);
+                    }
+                });
+            }
+            liveStatus.setText(status);
 
-           LeagueOfLegendsApiImpl leagueOfLegendsAPI2 = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-           List<AramMatchSummonerInfo> aramMatchSummonerInfo = leagueOfLegendsAPI2.getAramMatchesInfo(nickName);
-           Map<String, Long> championsWithIds = leagueOfLegendsAPI2.getChampionAndChampionsIds();
-           for (String champ: championsWithIds.keySet()) {
-               List<AramMatchSummonerInfo> statsForChampion = leagueOfLegendsAPI2.getAramMatchInfoByChampion(aramMatchSummonerInfo, championsWithIds.get(champ));
-               long totalGames = statsForChampion.size();
-               OptionalDouble avgDmg = statsForChampion.stream()
-                    .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
-                    .average();
-               OptionalDouble avgDuration = statsForChampion.stream()
-                    .mapToLong(AramMatchSummonerInfo::getGameDuration)
-                    .average();
-               if (avgDmg.isPresent() && totalGames > 0 && avgDuration.isPresent()) {
-                   double damagePerMinute = avgDmg.getAsDouble() / (avgDuration.getAsDouble() / 60.0);
-                   list.add("Champion: " + champ + " dmg/min: " + Float.toString((float) damagePerMinute));
-               }
-           }
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
-           list.add("placeholder");
+            LeagueOfLegendsApiImpl leagueOfLegendsAPI2 = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+            List<AramMatchSummonerInfo> aramMatchSummonerInfo = leagueOfLegendsAPI2.getAramMatchesInfo(nickName);
+            Map<String, Long> championsWithIds = leagueOfLegendsAPI2.getChampionAndChampionsIds();
+            for (String champ : championsWithIds.keySet()) {
+                List<AramMatchSummonerInfo> statsForChampion = leagueOfLegendsAPI2.getAramMatchInfoByChampion(aramMatchSummonerInfo, championsWithIds.get(champ));
+                long totalGames = statsForChampion.size();
+                OptionalDouble avgDmg = statsForChampion.stream()
+                        .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
+                        .average();
+                OptionalDouble avgDuration = statsForChampion.stream()
+                        .mapToLong(AramMatchSummonerInfo::getGameDuration)
+                        .average();
+                long wins = statsForChampion.stream().filter(AramMatchSummonerInfo::isWin).count();
+                if (avgDmg.isPresent() && totalGames > 0 && avgDuration.isPresent()) {
+                    double winratio = (1.0 * wins / totalGames) * 100;
+                    double damagePerMinute = avgDmg.getAsDouble() / (avgDuration.getAsDouble() / 60.0);
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    list.add(champ + " Avg dmg/min: " + df.format(damagePerMinute) + " Winratio: " + df.format(winratio) + "%");
+                }
+            }
 
-
-           adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1,list);
-           listView.setAdapter(adapter);
+            adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, list);
+            listView.setAdapter(adapter);
 
         } catch (IllegalStateException e) {
-           e.printStackTrace();
-           Toast.makeText(MainActivity.this, "No stats for user: " + nickName, Toast.LENGTH_SHORT).show();
-           super.onBackPressed();
+            e.printStackTrace();
+            Toast.makeText(MainActivity.this, "No stats for user: " + nickName, Toast.LENGTH_SHORT).show();
+            super.onBackPressed();
         }
 //
 //        bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -210,30 +205,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private String parseRank(String rank)
-    {
+    private String parseRank(String rank) {
         String arr[] = rank.split(" ", 2);
 
         String baseRank = arr[0];
         String stage = arr[1];
 
-        if("challenger".equalsIgnoreCase(baseRank))
+        if ("challenger".equalsIgnoreCase(baseRank))
             return "challenger";
-        if("grandmaster".equalsIgnoreCase(baseRank))
+        if ("grandmaster".equalsIgnoreCase(baseRank))
             return "grandmaster";
-        if("master".equalsIgnoreCase(baseRank))
+        if ("master".equalsIgnoreCase(baseRank))
             return "master";
-        if("diamond".equalsIgnoreCase(baseRank))
+        if ("diamond".equalsIgnoreCase(baseRank))
             return "diamond";
-        if("platinum".equalsIgnoreCase(baseRank))
+        if ("platinum".equalsIgnoreCase(baseRank))
             return "platinum";
-        if("gold".equalsIgnoreCase(baseRank))
+        if ("gold".equalsIgnoreCase(baseRank))
             return "gold";
-        if("silver".equalsIgnoreCase(baseRank))
+        if ("silver".equalsIgnoreCase(baseRank))
             return "silver";
-        if("bronze".equalsIgnoreCase(baseRank))
+        if ("bronze".equalsIgnoreCase(baseRank))
             return "bronze";
-        if("iron".equalsIgnoreCase(baseRank))
+        if ("iron".equalsIgnoreCase(baseRank))
             return "iron";
         return "";
     }
