@@ -105,9 +105,12 @@ public class MainActivity extends AppCompatActivity {
 
             mmrView.setText(Integer.toString(summonerInfo.getAramMMR()));
             LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-            String status = "OFFLINE";
+            String status = "LIVE";
+            liveStatus.setVisibility(View.INVISIBLE);
             if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nickName)) {
-                status = "LIVE";
+//                status = "LIVE";
+//                liveStatus.setText(status);
+                liveStatus.setVisibility(View.VISIBLE);
                 liveStatus.setTextColor(holo_green_dark);
                 liveStatus.setOnClickListener(new View.OnClickListener() {
                     @Override

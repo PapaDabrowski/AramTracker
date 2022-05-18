@@ -2,6 +2,7 @@ package com.example.aramtracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -40,20 +41,22 @@ public class LiveGameActivity extends AppCompatActivity {
 
         MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
         LeagueOfLegendsApiImpl leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-        Map<Integer, List<String>> currentGameParticipants = leagueOfLegendsAPI.getCurrentGameParticipantsByNick("Christian Díor");
-        for (Integer team : currentGameParticipants.keySet()) {
-            String key = team.toString();
-            String value = currentGameParticipants.get(team).toString();
-            for (String name : Objects.requireNonNull(currentGameParticipants.get(team))) {
-                try {
-                    AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name, "EUNE").orElseThrow(() -> new IllegalStateException("Error for user " + name));
-                    Toast.makeText(LiveGameActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getAramMMR(), Toast.LENGTH_SHORT).show();
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                    Toast.makeText(LiveGameActivity.this, "No info", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
+        Intent i = getIntent();
+        String nickName = i.getStringExtra("playerName");
+        Map<Integer, List<String>> currentGameParticipants = leagueOfLegendsAPI.getCurrentGameParticipantsByNick(nickName);
+//        for (Integer team : currentGameParticipants.keySet()) {
+//            String key = team.toString();
+//            String value = currentGameParticipants.get(team).toString();
+//            for (String name : Objects.requireNonNull(currentGameParticipants.get(team))) {
+//                try {
+//                    AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name, "EUNE").orElseThrow(() -> new IllegalStateException("Error for user " + name));
+//                    Toast.makeText(LiveGameActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getAramMMR(), Toast.LENGTH_SHORT).show();
+//                } catch (IllegalStateException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(LiveGameActivity.this, "No info", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        }
         for (String name : Objects.requireNonNull(currentGameParticipants.get(100)))
         {
             AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(name, "EUNE").orElseThrow(() -> new IllegalStateException("Error for user " + name));

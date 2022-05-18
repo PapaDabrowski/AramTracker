@@ -31,9 +31,6 @@ public class FavouritesListActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_favourites_list);
 
-
-        //wczytywanie do listy..
-
         ListView listView = (ListView) findViewById(R.id.favouritesList);
 
         adapter = new ArrayAdapter(FavouritesListActivity.this, android.R.layout.simple_list_item_1, list);
@@ -43,10 +40,14 @@ public class FavouritesListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getApplicationContext(),
                         MainActivity.class);
-//                Paper.book("MMR").read(nickName, mmr)
-//                Paper.book("closestRank").read(read, closestRank)
-                //intent.putExtra("playerName", getName(list.get(i)));
-                //intent.putExtra("playerServer", getServer(list.get(i)));
+                //Paper.book("MMR").read(nickName, mmr);
+                //Paper.book("closestRank").read(read, closestRank);
+                String arr[] = list.get(i).toString().split(" ", 2);
+
+                String baseRank = arr[0];
+                String stage = arr[1];
+                intent.putExtra("playerName", arr[0]);
+                intent.putExtra("playerServer", arr[1]);
                 startActivity(intent);
             }
         });
