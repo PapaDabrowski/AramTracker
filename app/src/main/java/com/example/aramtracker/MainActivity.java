@@ -1,24 +1,39 @@
 package com.example.aramtracker;
 
+import static android.R.color.holo_red_light;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.aramtracker.leagueoflegends.LeagueOfLegendsAPI;
+import com.example.aramtracker.leagueoflegends.LeagueOfLegendsApiImpl;
 import com.example.aramtracker.leagueoflegends.MatchMakingRatingApiImpl;
+import com.example.aramtracker.leagueoflegends.data.AramMatchSummonerInfo;
 import com.example.aramtracker.leagueoflegends.data.AramSummonerInfo;
+import com.example.aramtracker.properties.Props;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.OptionalDouble;
 
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
@@ -28,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private Fragment selectorFragment;
 
+    List list = new ArrayList();
+    ArrayAdapter adapter;
+
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -40,15 +59,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView nickNameTextView = (TextView)findViewById(R.id.nickName);
-        TextView temp = (TextView)findViewById(R.id.lol2);
-        ImageView rankView = (ImageView)findViewById(R.id.rank);
-
-
         Intent i = getIntent();
         String nickName = i.getStringExtra("playerName");
         String server = i.getStringExtra("playerServer");
+
+        TextView addToFav = (TextView)findViewById(R.id.addToFav);
+        addToFav.setText("Add +");
+        addToFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //dodanie do bazy
+                Toast.makeText(MainActivity.this, nickName + " -> was added to favourites", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        TextView nickNameTextView = (TextView)findViewById(R.id.nickName);
         nickNameTextView.setText(nickName);
+
+        TextView rankNameTextView = (TextView)findViewById(R.id.rankName);
+
+        ImageView rankView = (ImageView)findViewById(R.id.rank);
+
+        TextView liveStatus = (TextView)findViewById(R.id.liveStatus);
+
+        TextView mmrView = (TextView)findViewById(R.id.mmrTextView);
+
+        ListView listView = (ListView)findViewById(R.id.listView);
 
         MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
         try {
@@ -58,9 +94,56 @@ public class MainActivity extends AppCompatActivity {
            int imageResource = getResources().getIdentifier(imageUri, null, getPackageName());
            Drawable res = getResources().getDrawable(imageResource);
            rankView.setImageDrawable(res);
-           temp.setText(summonerInfo.getClosestRank());
+           rankNameTextView.setText(summonerInfo.getClosestRank());
 
-           //summonerInfo.
+           mmrView.setText(Integer.toString(summonerInfo.getAramMMR()));
+           LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+           String status = "OFFLINE";
+           if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nickName)) {
+               status = "LIVE";
+               liveStatus.setTextColor(holo_red_light);
+               liveStatus.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       Intent i = new Intent(getApplicationContext(),
+                               LiveGameActivity.class);
+                       i.putExtra("playerName", nickName);
+                       startActivity(i);
+                   }
+               });
+           }
+           liveStatus.setText(status);
+
+           LeagueOfLegendsApiImpl leagueOfLegendsAPI2 = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+           List<AramMatchSummonerInfo> aramMatchSummonerInfo = leagueOfLegendsAPI2.getAramMatchesInfo(nickName);
+           Map<String, Long> championsWithIds = leagueOfLegendsAPI2.getChampionAndChampionsIds();
+           for (String champ: championsWithIds.keySet()) {
+               List<AramMatchSummonerInfo> statsForChampion = leagueOfLegendsAPI2.getAramMatchInfoByChampion(aramMatchSummonerInfo, championsWithIds.get(champ));
+               long totalGames = statsForChampion.size();
+               OptionalDouble avgDmg = statsForChampion.stream()
+                    .mapToLong(AramMatchSummonerInfo::getTotalDamageDealtToChampions)
+                    .average();
+               OptionalDouble avgDuration = statsForChampion.stream()
+                    .mapToLong(AramMatchSummonerInfo::getGameDuration)
+                    .average();
+               if (avgDmg.isPresent() && totalGames > 0 && avgDuration.isPresent()) {
+                   double damagePerMinute = avgDmg.getAsDouble() / (avgDuration.getAsDouble() / 60.0);
+                   list.add("Champion: " + champ + " dmg/min: " + Float.toString((float) damagePerMinute));
+               }
+           }
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+           list.add("placeholder");
+
+
+           adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1,list);
+           listView.setAdapter(adapter);
 
         } catch (IllegalStateException e) {
            e.printStackTrace();
@@ -149,6 +232,5 @@ public class MainActivity extends AppCompatActivity {
             return "iron";
         return "";
     }
-
 
 }

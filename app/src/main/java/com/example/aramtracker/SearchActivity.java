@@ -80,22 +80,16 @@ public class SearchActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(SearchActivity.this, "Insert Nickname!", Toast.LENGTH_SHORT).show();
                 }
-            }
+            }});
 
-
-        });
-
-        //DISPLAY EXAMPLE
-//        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
-//        String nick = "Horniss";
-//        try {
-//            AramSummonerInfo summonerInfo = whatIsMyMMR.getSummonerInfoByNick(nick).orElseThrow(() -> new IllegalStateException("Error for user " + nick));
-//            Toast.makeText(SearchActivity.this, summonerInfo.getNickname() + ": " + summonerInfo.getClosestRank(), Toast.LENGTH_SHORT).show();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//            Toast.makeText(SearchActivity.this, "No stats for user: " + nick, Toast.LENGTH_SHORT).show();
-//        }
-
+        Button fav = (Button) findViewById(R.id.favourites);
+        fav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(),
+                        FavouritesListActivity.class);
+                startActivity(i);
+            }});
 
         // DISPLAY LIVE GAME PLAYERS MMR
 //        MatchMakingRatingApiImpl whatIsMyMMR = new MatchMakingRatingApiImpl();
@@ -126,12 +120,6 @@ public class SearchActivity extends AppCompatActivity {
 //                .average();
 //        Toast.makeText(SearchActivity.this, "User:  " + nick + " | Champion: " + champion + " AVG DMG: " + avgDamage , Toast.LENGTH_SHORT).show();
 
-        // IF IN LIVE GAME
-//        LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
-//        String nnn = "FirmaReported";
-//        if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nnn)) {
-//            Toast.makeText(SearchActivity.this, "Player " + nnn + " in live game", Toast.LENGTH_SHORT).show();
-//        }
 //
         // AVG DMG PER CHAMPION
 //        String nick = "koncaty3K";
