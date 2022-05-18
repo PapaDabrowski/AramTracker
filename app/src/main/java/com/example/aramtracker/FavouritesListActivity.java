@@ -16,6 +16,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.paperdb.Paper;
+
 public class FavouritesListActivity extends AppCompatActivity {
 
     List list = new ArrayList();
@@ -32,17 +34,18 @@ public class FavouritesListActivity extends AppCompatActivity {
 
         //wczytywanie do listy..
 
-        ListView listView = (ListView)findViewById(R.id.favouritesList);
+        ListView listView = (ListView) findViewById(R.id.favouritesList);
 
-        adapter = new ArrayAdapter(FavouritesListActivity.this, android.R.layout.simple_list_item_1,list);
+        adapter = new ArrayAdapter(FavouritesListActivity.this, android.R.layout.simple_list_item_1, list);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
-            {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getApplicationContext(),
                         MainActivity.class);
-               //intent.putExtra("playerName", getName(list.get(i)));
+//                Paper.book("MMR").read(nickName, mmr)
+//                Paper.book("closestRank").read(read, closestRank)
+                //intent.putExtra("playerName", getName(list.get(i)));
                 //intent.putExtra("playerServer", getServer(list.get(i)));
                 startActivity(intent);
             }

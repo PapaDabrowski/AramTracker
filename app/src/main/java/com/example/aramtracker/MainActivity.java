@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.OptionalDouble;
 
+import io.paperdb.Paper;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        Paper.init(getApplicationContext());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //dodanie do bazy
+//                Paper.book("MMR").write(nickName, mmr)
+//                Paper.book("closestRank").read(nickName, closestRank)
                 Toast.makeText(MainActivity.this, nickName + " -> was added to favourites", Toast.LENGTH_SHORT).show();
             }
         });
