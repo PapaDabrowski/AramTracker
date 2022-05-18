@@ -35,6 +35,7 @@ import android.view.WindowManager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.paperdb.Paper;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
@@ -60,6 +63,8 @@ public class SearchActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
 
+        Paper.init(getApplicationContext());
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_search);
@@ -69,6 +74,7 @@ public class SearchActivity extends AppCompatActivity {
 
         Button trackPlayer = (Button) findViewById(R.id.buttonFind);
         trackPlayer.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(),
@@ -120,6 +126,12 @@ public class SearchActivity extends AppCompatActivity {
 //                .average();
 //        Toast.makeText(SearchActivity.this, "User:  " + nick + " | Champion: " + champion + " AVG DMG: " + avgDamage , Toast.LENGTH_SHORT).show();
 
+        // IF IN LIVE GAME
+//        LeagueOfLegendsAPI leagueOfLegendsAPI = new LeagueOfLegendsApiImpl(new Props(getApplicationContext()));
+//        String nnn = "FirmaReported";
+//        if (leagueOfLegendsAPI.checkIfPlayerInLiveGame(nnn)) {
+//            Toast.makeText(SearchActivity.this, "Player " + nnn + " in live game", Toast.LENGTH_SHORT).show();
+//        }
 //
         // AVG DMG PER CHAMPION
 //        String nick = "koncaty3K";
@@ -136,9 +148,14 @@ public class SearchActivity extends AppCompatActivity {
 //            OptionalDouble avgDuration = statsForChampion.stream()
 //                    .mapToLong(AramMatchSummonerInfo::getGameDuration)
 //                    .average();
+//            long wins = statsForChampion.stream().filter(AramMatchSummonerInfo::isWin).count();
+//
 //            if (avgDmg.isPresent() && totalGames > 0 && avgDuration.isPresent()) {
 //                double damagePerMinute = avgDmg.getAsDouble() / (avgDuration.getAsDouble() / 60.0);
-//                Toast.makeText(SearchActivity.this, " Champion: " + champ + " dmg/min: " + damagePerMinute, Toast.LENGTH_SHORT).show();
+//                double winratio = 1.0*wins / totalGames ;
+//                DecimalFormat df = new DecimalFormat("0.00");
+//                Toast.makeText(SearchActivity.this, " Champion: " + champ + " dmg/min: " + df.format(damagePerMinute), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SearchActivity.this, " Champion: " + champ + " winratio " + df.format(winratio), Toast.LENGTH_SHORT).show();
 //            }
 //        }
     }
